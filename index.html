@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YouTube to Direct Embed Link Converter</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+    --primary: #ff0000;
+    --primary-dark: #cc0000;
+    --secondary: #343a40;
+    --background: #fff;
+    --surface: #ffffff;
+    --on-surface: #212121;
+    --on-surface-muted: #6c757d;
+    --success: #4caf50;
+    --error: #f44336;
+    --border-color: #dee2e6;
+    --border-radius: 12px;
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--background);
+    color: var(--on-surface);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.container {
+    background: var(--surface);
+    padding: 40px;
+    border-radius: var(--border-radius); 
+    width: 100%;
+    max-width: 580px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), #ff5e5e);
+}
+
+.logo-container {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    height: 40px;
+}
+
+h1 {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    background: linear-gradient(90deg, var(--primary), #ff5e5e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.subtitle {
+    color: var(--on-surface-muted);
+    margin-bottom: 32px;
+    font-size: 16px;
+}
+
+.input-group {
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--on-surface-muted);
+    font-size: 14px;
+}
+
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--on-surface-muted);
+}
+
+.input-with-icon input {
+    padding-left: 48px;
+}
+
+input {
+    width: 100%;
+    padding: 16px;
+    background: #f8f9fa;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    color: var(--on-surface);
+    font-size: 16px;
+    transition: var(--transition);
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: var(--surface);
+}
+
+.embed-container {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+textarea {
+    flex: 1;
+    padding: 16px;
+    background: #f8f9fa;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    color: var(--on-surface);
+    font-size: 15px;
+    resize: none;
+    min-height: 100px;
+    transition: var(--transition);
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    background-color: var(--surface);
+}
+
+button {
+    padding: 16px 24px;
+    border-radius: var(--border-radius);
+    border: none;
+    background: var(--primary);
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 16px;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+button:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+.info-text {
+    font-size: 14px;
+    color: var(--on-surface-muted);
+    margin-top: 16px;
+    line-height: 1.5;
+}
+
+.toast {
+    visibility: hidden;
+    min-width: 280px;
+    background-color: var(--secondary);
+    color: #fff;
+    text-align: center;
+    border-radius: var(--border-radius);
+    padding: 16px 24px;
+    position: fixed;
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%);
+    z-index: 100;
+    font-size: 16px;
+    opacity: 0;
+    transition: opacity 0.3s, bottom 0.3s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.toast.success {
+    background-color: var(--success);
+}
+
+.toast.error {
+    background-color: var(--error);
+}
+
+.toast.show {
+    visibility: visible;
+    opacity: 1;
+    bottom: 50px;
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 30px 20px;
+    }
+    
+    .embed-container {
+        flex-direction: column;
+    }
+    
+    button {
+        width: 100%;
+    }
+}
+
+footer {
+            padding: 2rem;
+            text-align: center;
+            background: var(--dark);
+            border-top: 1px solid var(--glass-border);
+            user-select: none;
+            color: #000;
+        }
+
+        footer a {
+            color: #FF0000;
+            text-decoration: none;
+        }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="logo-container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Logo_2017.svg" alt="YouTube Logo" class="logo">
+    </div>
+    
+    <h1>YouTube to Embed Link Converter</h1>
+    <p class="subtitle">Transform YouTube URLs into direct embed links instantly</p>
+    
+    <div class="input-group">
+        <label for="youtubeUrl">YouTube URL</label>
+        <div class="input-with-icon">
+            <i class="fas fa-link"></i>
+            <input type="text" id="youtubeUrl" placeholder="Paste YouTube link here">
+        </div>
+    </div>
+    
+    <div class="input-group">
+        <label for="embedLink">Embed Link</label>
+        <div class="embed-container">
+            <textarea id="embedLink" readonly placeholder="Your direct embed link will appear here"></textarea>
+            <button onclick="copyLink()">
+                <i class="fas fa-copy"></i> Copy
+            </button>
+        </div>
+    </div>
+
+<div id="toast" class="toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toast-message"></span>
+</div>
+
+<footer>
+    © <a href="https://zoro2045.github.io/" target="_blank">ZORO</a> All rights reserved.
+</footer>
+
+<script>
+function generateEmbedLink() {
+    const url = document.getElementById('youtubeUrl').value;
+    const videoIdMatch = url.match(/(?:https?:\/\/)?(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-]{11})(?:&[^ ]+)?/);
+    
+    if(videoIdMatch) {
+        const videoId = videoIdMatch[1];
+        const embedLink = `https://www.youtube.com/embed/${videoId}`;
+        document.getElementById('embedLink').value = embedLink;
+        return true;
+    } else {
+        document.getElementById('embedLink').value = '';
+        showToast("Please enter a valid YouTube URL", "error");
+        return false;
+    }
+}
+
+function copyLink() {
+    if(generateEmbedLink()) {
+        const embedLink = document.getElementById('embedLink');
+        embedLink.select();
+        embedLink.setSelectionRange(0, 99999); 
+        navigator.clipboard.writeText(embedLink.value)
+            .then(() => {
+                showToast("Embed link copied to clipboard!", "success");
+            })
+            .catch(err => {
+                showToast("Failed to copy. Please try again.", "error");
+            });
+    }
+}
+
+function showToast(message, type = "success") {
+    const toast = document.getElementById("toast");
+    const toastMessage = document.getElementById("toast-message");
+    
+    toastMessage.textContent = message;
+    
+    let iconClass;
+    if (type === "success") {
+        iconClass = "fas fa-check-circle";
+    } else {
+        iconClass = "fas fa-exclamation-circle";
+    }
+    
+    toast.innerHTML = `<i class="${iconClass}"></i> <span id="toast-message">${message}</span>`;
+    
+    toast.className = "toast " + type;
+    toast.classList.add("show");
+    
+    setTimeout(() => { 
+        toast.className = toast.className.replace("show", "").replace(type, ""); 
+    }, 3000);
+}
+
+document.getElementById('youtubeUrl').addEventListener('input', generateEmbedLink);
+document.getElementById('youtubeUrl').addEventListener('paste', function() {
+    setTimeout(generateEmbedLink, 50);
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('youtubeUrl').placeholder = "e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+});
+</script>
+</body>
+</html>
